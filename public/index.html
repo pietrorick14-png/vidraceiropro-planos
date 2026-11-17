@@ -147,18 +147,18 @@ h1{text-align:center;font-size:clamp(22px,4vw,30px);font-weight:800;letter-spaci
 (function(){
   /* AINDA SEM STRIPE/SUPABASE DESTA OFERTA: quando o Pietro conectar, troque FN e KEY
      pelo endpoint da função "compra-site" do projeto Supabase do Vidraceiro Pro. */
-  var FN=null,KEY=null;
+  var FN='https://mffrtkdxldcgcatsqgnj.supabase.co/functions/v1/compra-site',KEY='sb_publishable_ufkP6XFtMjHhZoTOtbL-hg_Z9sAQmWT';
   var PIX_ON=true;
-  var PL={pro:{nome:'PRO individual',mes:'R$ 89,90',mesDe:'R$ 249,90',desc:'64',pixMes:'R$ 99,90',ano:'R$ 863',anoMes:'R$ 71,92',eco:'Economize R$ 215'},
-    equipe:{nome:'PRO Equipe',mes:'R$ 119,90',mesDe:'R$ 349,90',desc:'66',pixMes:'R$ 129,90',ano:'R$ 1.151',anoMes:'R$ 95,92',eco:'Economize R$ 287'}};
+  // Essa página só é linkada a partir da VSL do Vidraceiro Pro: o funil é sempre "vsl" (17/11/2026).
+  var FUNIL='vsl';
+  var PL={pro:{api:'individual',nome:'PRO individual',mes:'R$ 89,90',mesDe:'R$ 249,90',desc:'64',pixMes:'R$ 99,90',ano:'R$ 799',anoMes:'R$ 66,58',eco:'Economize R$ 279,80'},
+    equipe:{api:'equipe',nome:'PRO Equipe',mes:'R$ 119,90',mesDe:'R$ 349,90',desc:'66',pixMes:'R$ 129,90',ano:'R$ 1.099',anoMes:'R$ 91,58',eco:'Economize R$ 339,80'}};
   var pg=document.getElementById('pg'),pgIn=document.getElementById('pg-in'),plAtual='equipe',foco=null;
-  function paga(plano,metodo,b){if(b.dataset.ab)return;
-    if(!FN){alert('Pagamento ainda não conectado nesta oferta.');return;}
+  function paga(plano,metodo,periodo,b){if(b.dataset.ab)return;
     var t=b.innerHTML,qs=new URLSearchParams(location.search),utm={};
     ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','src','sck'].forEach(function(k){var v=qs.get(k);if(v)utm[k]=v;});
-    var funilQ=qs.get('funil'),funil=/^[a-z0-9_-]{2,20}$/i.test(funilQ||'')?funilQ:'vsl';
     b.dataset.ab='1';b.innerHTML='Abrindo o pagamento…';var volta=function(){b.innerHTML=t;delete b.dataset.ab;};
-    fetch(FN,{method:'POST',headers:{'Content-Type':'application/json',apikey:KEY},body:JSON.stringify({acao:'checkout',plano:plano,metodo:metodo,utm:utm,divulg:null,funil:funil})})
+    fetch(FN,{method:'POST',headers:{'Content-Type':'application/json',apikey:KEY},body:JSON.stringify({plano:PL[plano].api,metodo:metodo,periodo:periodo,utm:utm,funil:FUNIL})})
       .then(function(r){return r.json();}).then(function(j){if(j&&j.url){location.href=j.url;setTimeout(volta,8000);}else{volta();}})
       .catch(function(){volta();});}
   function desenha(){var P=PL[plAtual];
@@ -184,7 +184,8 @@ h1{text-align:center;font-size:clamp(22px,4vw,30px);font-weight:800;letter-spaci
   function pgFecha(){pg.classList.remove('on');document.body.style.overflow='';setTimeout(function(){pg.hidden=true;},200);if(foco)try{foco.focus();}catch(e){}}
   pg.addEventListener('click',function(e){if(e.target===pg){pgFecha();return;}var b=e.target.closest('[data-pg]');if(!b)return;var k=b.dataset.pg;
     if(k==='fechar'){pgFecha();return;}if(k==='p-equipe'||k==='p-pro'){plAtual=k.slice(2);desenha();return;}
-    if(k==='cartao')paga(plAtual,'cartao',b);else if(k==='anual')paga(plAtual+'_anual','cartao',b);else if(k==='pix1'||k==='pix12')paga(plAtual,k,b);});
+    if(k==='cartao')paga(plAtual,'cartao','mensal',b);else if(k==='anual')paga(plAtual,'cartao','anual',b);
+    else if(k==='pix1')paga(plAtual,'pix','mensal',b);else if(k==='pix12')paga(plAtual,'pix','anual',b);});
   document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!pg.hidden)pgFecha();});
   Array.prototype.forEach.call(document.querySelectorAll('[data-plano]'),function(b){b.addEventListener('click',function(){pgAbre(b.dataset.plano,b);});});
   var qp=new URLSearchParams(location.search).get('plano');if(qp)pgAbre(qp);
