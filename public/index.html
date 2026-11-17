@@ -149,8 +149,9 @@ h1{text-align:center;font-size:clamp(22px,4vw,30px);font-weight:800;letter-spaci
      pelo endpoint da função "compra-site" do projeto Supabase do Vidraceiro Pro. */
   var FN='https://mffrtkdxldcgcatsqgnj.supabase.co/functions/v1/compra-site',KEY='sb_publishable_ufkP6XFtMjHhZoTOtbL-hg_Z9sAQmWT';
   var PIX_ON=true;
-  // Essa página só é linkada a partir da VSL do Vidraceiro Pro: o funil é sempre "vsl" (17/11/2026).
-  var FUNIL='vsl';
+  // De onde a pessoa veio (ex.: ?funil=bio no link da bio do Instagram); padrão "vsl" (17/11/2026).
+  var qsFunil=new URLSearchParams(location.search).get('funil');
+  var FUNIL=/^[a-z0-9_-]{2,20}$/i.test(qsFunil||'')?qsFunil:'vsl';
   var PL={pro:{api:'individual',nome:'PRO individual',mes:'R$ 89,90',mesDe:'R$ 249,90',desc:'64',pixMes:'R$ 99,90',ano:'R$ 799',anoMes:'R$ 66,58',eco:'Economize R$ 279,80'},
     equipe:{api:'equipe',nome:'PRO Equipe',mes:'R$ 119,90',mesDe:'R$ 349,90',desc:'66',pixMes:'R$ 129,90',ano:'R$ 1.099',anoMes:'R$ 91,58',eco:'Economize R$ 339,80'}};
   var pg=document.getElementById('pg'),pgIn=document.getElementById('pg-in'),plAtual='equipe',foco=null;
